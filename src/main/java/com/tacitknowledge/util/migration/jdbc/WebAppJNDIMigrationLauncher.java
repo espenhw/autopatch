@@ -18,7 +18,6 @@ package com.tacitknowledge.util.migration.jdbc;
 import com.tacitknowledge.util.discovery.ClassDiscoveryUtil;
 import com.tacitknowledge.util.discovery.WebAppResourceListSource;
 import com.tacitknowledge.util.migration.MigrationException;
-import com.tacitknowledge.util.migration.jdbc.util.MigrationUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -76,7 +75,10 @@ public class WebAppJNDIMigrationLauncher implements ServletContextListener
             // task is executed, the patch level is incremented, etc.
             try
             {
-                MigrationUtil.doMigrations(sce);
+                JdbcMigrationLauncherFactory launcherFactory =
+                        new JdbcMigrationLauncherFactoryLoader().createFactory();
+                JdbcMigrationLauncher launcher = launcherFactory.createMigrationLauncher(sce);
+                launcher.doMigrations();
             }
             catch (MigrationException e)
             {

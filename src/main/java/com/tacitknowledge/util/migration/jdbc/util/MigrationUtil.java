@@ -7,8 +7,6 @@ import com.tacitknowledge.util.migration.jdbc.JdbcMigrationLauncherFactoryLoader
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.ServletContextEvent;
-
 /**
  * A utility class for migration initialization needs
  *
@@ -31,20 +29,6 @@ public class MigrationUtil
 
     private JdbcMigrationLauncherFactory launcherFactory;
 
-
-    /**
-     * Helper method to initiate the migration process.
-     *
-     * @param sce the <code>ServletContextEvent</code> being handled
-     * @throws MigrationException
-     */
-    public static void doMigrations(final ServletContextEvent sce) throws MigrationException
-    {
-        JdbcMigrationLauncherFactory launcherFactory =
-                new JdbcMigrationLauncherFactoryLoader().createFactory();
-        JdbcMigrationLauncher launcher = launcherFactory.createMigrationLauncher(sce);
-        launcher.doMigrations();
-    }
 
     /**
      * Helper method to initiate the migration process.
