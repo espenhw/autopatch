@@ -120,6 +120,7 @@ public class PatchTable implements PatchInfoStore
             log.info("'patches' table must not exist; creating....");
             try
             {
+                context.rollback();
                 stmt = conn.prepareStatement(getSql("patches.create"));
                 if (log.isDebugEnabled())
                 {
