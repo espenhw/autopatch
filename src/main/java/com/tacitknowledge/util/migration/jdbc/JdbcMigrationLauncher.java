@@ -127,12 +127,8 @@ public class JdbcMigrationLauncher implements RollbackListener
 
         try
         {
-            Iterator contextIter = contexts.keySet().iterator();
             int migrationCount = 0;
-            while (contextIter.hasNext())
-            {
-                JdbcMigrationContext context =
-                        (JdbcMigrationContext) contextIter.next();
+            for (JdbcMigrationContext context : contexts.keySet()) {
                 migrationCount = doMigrations(context);
                 log.info("Executed " + migrationCount + " patches for context "
                         + context);
@@ -196,7 +192,7 @@ public class JdbcMigrationLauncher implements RollbackListener
             // restore autocommit state
             finally
             {
-                if ((conn != null) && !conn.isClosed())
+                if (!conn.isClosed())
                 {
                     conn.setAutoCommit(commitState);
                 }
@@ -392,15 +388,12 @@ public class JdbcMigrationLauncher implements RollbackListener
     public void migrationSuccessful(MigrationTask task, MigrationContext ctx) throws MigrationException
     {
         log.debug("Task " + task.getName() + " was successful for context " + ctx + " in launcher " + this);
-        int patchLevel = task.getLevel().intValue();
+        int patchLevel = task.getLevel();
 
         // update all of our controlled patch tables
-        for (Iterator patchTableIter = contexts.entrySet().iterator(); patchTableIter.hasNext();)
-        {
-            PatchInfoStore store = (PatchInfoStore) ((Map.Entry) patchTableIter.next()).getValue();
+        for (PatchInfoStore store : contexts.values()) {
             MigrationRunnerStrategy strategy = getMigrationProcess().getMigrationRunnerStrategy();
-            if (strategy.shouldMigrationRun(patchLevel, store))
-            {
+            if (strategy.shouldMigrationRun(patchLevel, store)) {
                 store.updatePatchLevel(patchLevel);
             }
         }
@@ -424,7 +417,7 @@ public class JdbcMigrationLauncher implements RollbackListener
      */
     public int getDatabasePatchLevel(MigrationContext ctx) throws MigrationException
     {
-        PatchInfoStore patchTable = (PatchInfoStore) contexts.get(ctx);
+        PatchInfoStore patchTable = contexts.get(ctx);
         return patchTable.getPatchLevel();
     }
 
@@ -496,7 +489,7 @@ public class JdbcMigrationLauncher implements RollbackListener
             // restore autocommit state
             finally
             {
-                if ((conn != null) && !conn.isClosed())
+                if (!conn.isClosed())
                 {
                     conn.setAutoCommit(commitState);
                 }
@@ -545,7 +538,7 @@ public class JdbcMigrationLauncher implements RollbackListener
         {
             waitForFreeLock(context);
 
-            PatchInfoStore piStore = (PatchInfoStore) contexts.get(context);
+            PatchInfoStore piStore = contexts.get(context);
             piStore.getPatchLevel();
             try
             {
@@ -571,7 +564,7 @@ public class JdbcMigrationLauncher implements RollbackListener
     protected PatchInfoStore createPatchStore(JdbcMigrationContext context) throws MigrationException
     {
         // Make sure the table is created before claiming it exists by returning
-        return (PatchInfoStore) contexts.get(context);
+        return contexts.get(context);
     }
 
     /**
@@ -582,7 +575,7 @@ public class JdbcMigrationLauncher implements RollbackListener
      */
     private void waitForFreeLock(JdbcMigrationContext context) throws MigrationException
     {
-        PatchInfoStore piStore = (PatchInfoStore) contexts.get(context);
+        PatchInfoStore piStore = contexts.get(context);
         log.debug("about to wait for free lock");
         for (int i = 0; piStore.isPatchStoreLocked(); i++)
         {
@@ -719,7 +712,7 @@ public class JdbcMigrationLauncher implements RollbackListener
      *
      * @param contexts the collection of contexts that is a map of JDBCMigrationContext -> PatchInfoStore.
      */
-    public void setContexts(LinkedHashMap contexts)
+    public void setContexts(LinkedHashMap<JdbcMigrationContext, PatchInfoStore> contexts)
     {
         this.contexts = contexts;
     }
@@ -754,12 +747,8 @@ public class JdbcMigrationLauncher implements RollbackListener
     public void rollbackSuccessful(RollbackableMigrationTask task, int rollbackLevel, MigrationContext context) throws MigrationException
     {
         log.debug("Rollback of task " + task.getName() + " was successful for context " + context + " in launcher " + this);
-        int patchLevel = task.getLevel().intValue();
-
         // update all of our controlled patch tables
-        for (Iterator patchTableIter = contexts.entrySet().iterator(); patchTableIter.hasNext();)
-        {
-            PatchInfoStore store = (PatchInfoStore) ((Map.Entry) patchTableIter.next()).getValue();
+        for (PatchInfoStore store : contexts.values()) {
             store.updatePatchLevelAfterRollBack(rollbackLevel);
         }
     }

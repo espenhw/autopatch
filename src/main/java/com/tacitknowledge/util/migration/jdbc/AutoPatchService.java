@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -75,7 +74,7 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
     /**
      * A set of contexts, in case you want multi-node patches
      */
-    private List contexts = new ArrayList();
+    private List<JdbcMigrationContext> contexts = new ArrayList<JdbcMigrationContext>();
 
     /**
      * Patches the database, if necessary.
@@ -117,9 +116,8 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
         // otherwise, add the collection of contexts in there
         else
         {
-            for (Iterator i = contexts.iterator(); i.hasNext();)
-            {
-                launcher.addContext((JdbcMigrationContext) i.next());
+            for (JdbcMigrationContext context : contexts) {
+                launcher.addContext(context);
             }
         }
         launcher.setPatchPath(getPatchPath());
@@ -279,7 +277,7 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
      *
      * @param contexts List of JdbcMigrationContext objects for multi-node, or empty list
      */
-    public void setContexts(List contexts)
+    public void setContexts(List<JdbcMigrationContext> contexts)
     {
         this.contexts = contexts;
     }
