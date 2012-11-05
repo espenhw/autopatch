@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tacitknowledge</groupId>
     <artifactId>autopatch</artifactId>
-    <version>1.4.3-SNAPSHOT</version>
+    <version>1.4.2-ehw1</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -118,6 +118,16 @@
                 </includes>
             </testResource>
         </testResources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
         <!-- Plugins configuration -->
         <plugins>
