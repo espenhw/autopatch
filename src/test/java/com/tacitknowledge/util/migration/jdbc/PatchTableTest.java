@@ -225,6 +225,7 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new Integer[]{new Integer(12)});
         handler.prepareResultSet(table.getSql("level.read"), rs, new String[]{"milestone"});
+        patchTableExists();
 
         table.updatePatchLevel(13);
         
@@ -233,7 +234,14 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         commonVerifications();
         verifyCommitted();
     }
-    
+
+    private void patchTableExists() {
+        conn.getPreparedStatementResultSetHandler();
+        MockResultSet rs = handler.createResultSet();
+        rs.addRow(new Integer[]{12});
+        handler.prepareResultSet(table.getSql("level.table.exists"), rs, new String[]{"milestone"});
+    }
+
     /**
      * Validates that <code>isPatchTableLocked</code> works when no lock exists.
      * 
@@ -247,7 +255,8 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new String[]{"F"});
         handler.prepareResultSet(table.getSql("lock.read"), rs, new String[]{"milestone", "milestone"});
-        
+        patchTableExists();
+
         assertFalse(table.isPatchStoreLocked());
         commonVerifications();
         verifyNotCommitted();
@@ -266,7 +275,8 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new String[]{"T"});
         handler.prepareResultSet(table.getSql("lock.read"), rs, new String[]{"milestone", "milestone"});
-        
+        patchTableExists();
+
         assertTrue(table.isPatchStoreLocked());
         commonVerifications();
         verifyNotCommitted();
@@ -284,7 +294,8 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Return a non-empty set in response to the patch lock query
         handler = conn.getPreparedStatementResultSetHandler();
         handler.prepareUpdateCount(table.getSql("lock.obtain"), 0, new String[] {"milestone", "milestone"});
-        
+        patchTableExists();
+
         try
         {
             table.lockPatchStore();
@@ -314,7 +325,8 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         handler = conn.getPreparedStatementResultSetHandler();
         MockResultSet rs = handler.createResultSet();
         handler.prepareUpdateCount(table.getSql("lock.obtain"), 1, new String[] {"milestone", "milestone"});
-        
+        patchTableExists();
+
         table.lockPatchStore();
         verifyPreparedStatementParameter(table.getSql("lock.obtain"), 1, "milestone");
         verifyPreparedStatementParameter(table.getSql("lock.obtain"), 2, "milestone");
