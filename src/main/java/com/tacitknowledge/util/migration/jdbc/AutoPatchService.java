@@ -16,6 +16,7 @@
 package com.tacitknowledge.util.migration.jdbc;
 
 import com.tacitknowledge.util.migration.MigrationException;
+import com.tacitknowledge.util.migration.MigrationRunnerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -76,6 +77,8 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
      */
     private List<JdbcMigrationContext> contexts = new ArrayList<JdbcMigrationContext>();
 
+    private String migrationRunnerStrategy = MigrationRunnerFactory.DEFAULT_MIGRATION_STRATEGY;
+
     /**
      * Patches the database, if necessary.
      *
@@ -120,6 +123,7 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
                 launcher.addContext(context);
             }
         }
+        launcher.setMigrationStrategy(getMigrationRunnerStrategy());
         launcher.setPatchPath(getPatchPath());
         launcher.setPostPatchPath(getPostPatchPath());
         launcher.setReadOnly(isReadOnly());
@@ -290,5 +294,13 @@ public class AutoPatchService extends JdbcMigrationLauncherFactory
     public void addContext(JdbcMigrationContext context)
     {
         contexts.add(context);
+    }
+
+    public String getMigrationRunnerStrategy() {
+        return migrationRunnerStrategy;
+    }
+
+    public void setMigrationRunnerStrategy(String migrationRunnerStrategy) {
+        this.migrationRunnerStrategy = migrationRunnerStrategy;
     }
 }
