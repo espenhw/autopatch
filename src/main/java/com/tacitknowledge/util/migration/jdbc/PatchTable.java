@@ -290,7 +290,7 @@ public class PatchTable implements PatchInfoStore
             conn = context.getConnection();
             stmt = conn.prepareStatement(getSql("level.exists"));
             stmt.setString(1, context.getSystemName());
-            stmt.setString(2, String.valueOf(patchLevel));
+            stmt.setInt(2, patchLevel);
             rs = stmt.executeQuery();
             if (rs.next())
             {
